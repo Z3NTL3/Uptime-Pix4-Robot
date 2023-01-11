@@ -1,6 +1,6 @@
 {
   "name": "uptime-pix4",
-  "version": "3.8.0",
+  "version": "3.9.0",
   "description": "Uptime robot check for pix4 services",
   "repository": {
     "type": "git",
