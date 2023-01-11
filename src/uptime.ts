@@ -1,6 +1,6 @@
 
 /**
- * Programmged by Pix4
+ * Programmed by Pix4
  * Author: Z3NTL3
  * 
  * License: GNU
