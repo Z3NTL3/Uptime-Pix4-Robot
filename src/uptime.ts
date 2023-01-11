@@ -18,8 +18,6 @@ type domainStates = {
     domain: string
     state: STATUS
 }
-
-type States = Array<domainStates>
 const listDomains: Array<String> = [
     `https://${DOMAINS.main}`,
     `https://${DOMAINS.api}`,
