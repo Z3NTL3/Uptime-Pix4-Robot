@@ -66,8 +66,9 @@ class UptimeCheck<IUP> {
                         let req = await Undici.request(v,{method: "GET",dispatcher: this.agent})
                         
                         if(req.statusCode >= 200 && req.statusCode <= 399){
-                            if(typeof req.headers[maintenanceHeader] !== 'undefined' && req.headers[maintenanceHeader] === "yes") {this.status[index].state === 'maintenance'}
-                            else { this.status[index].state = "offline" }
+                            if(req.headers[maintenanceHeader] === "yes"){
+                                this.status[index].state = "maintenance"
+                            } else { this.status[index].state = "online" }
                         } else {
                             this.status[index].state = "offline"
                         }
@@ -84,7 +85,7 @@ class UptimeCheck<IUP> {
                 await req(i,v).catch((err: Error) =>{
                     errT = true
                     errI = err
-                })            
+                })           
             } 
             if(errT){
                 return reject(errI)

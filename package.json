@@ -15,7 +15,6 @@
   "license": "ISC",
   "dependencies": {
     "undici": "^5.16.0",
-    "uptime-pix4": "^4.5.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.18"

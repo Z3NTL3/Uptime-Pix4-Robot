@@ -1,20 +1,25 @@
 # Uptime Pix4
+
 A uptime robot for Pix4 services
 
 # Example
+
 ```js
-const { UptimeCheck } = require('uptime-pix4')
+const { UptimeCheck } = require("uptime-pix4");
 
-( async () => {
-    const robot = new UptimeCheck() // init class
-    robot.humanify([{ 
-        "cache-control": "no-cache"
-    }]) // used user agents at the request
-    
-    await robot.checkIfUp().catch((err) =>{ // check if website is accessable
-        console.log('oops..:', err)
-    }) 
+(async () => {
+  const robot = new UptimeCheck(); // init class
+  robot.humanify([
+    {
+      "cache-control": "no-cache",
+    },
+  ]); // used user agents at the request
 
-    console.log(robot.status) // see status information
-})()
+  await robot.checkIfUp().catch((err) => {
+    // check if website is accessable
+    console.log("oops..:", err);
+  });
+
+  console.log(robot.status); // see status information
+})();
 ```
