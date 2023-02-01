@@ -6,21 +6,25 @@
  * License: GNU
  */
 
-import http from 'http'
+import Undici , { Agent } from 'undici'
 
+const maintenanceHeader = 'x-pix4-maintenance'
 type HEADERS = Array<Record<string,string>>
-type STATUS = "online" | "offline" | "not-checked"
+type STATUS = "online" | "offline" | "not-checked" | "maintenance"
 enum DOMAINS {
     main="pix4.dev",
-    api="api.pix4.dev"
+    api="api.pix4.dev",
+    my="my.pix4.dev"
 }
 type domainStates = {
     domain: string
     state: STATUS
 }
+type States = Array<domainStates>
 const listDomains: Array<String> = [
     `https://${DOMAINS.main}`,
     `https://${DOMAINS.api}`,
+    `https://${DOMAINS.my}`,
 ]
 
 interface IUP {
@@ -31,13 +35,14 @@ interface IUP {
 class UptimeCheck<IUP> {
     status: Array<domainStates>
     private finalHeaders: { [key: string]: string }
-    private agent: http.Agent
+    private agent: Agent
 
     constructor(){
         this.finalHeaders = {}
         this.status = []
-        this.agent = new http.Agent({
-            timeout: 5000
+        this.agent = new Agent({
+            keepAliveTimeout: 5,
+            keepAliveMaxTimeout: 5
         })
         for(var i = 0; i < listDomains.length; i++){
             this.status.push({domain: listDomains[i].replace("https://",""), state: "not-checked"})
@@ -53,30 +58,20 @@ class UptimeCheck<IUP> {
     }
 
     checkIfUp():Promise<any> {
-        return new Promise(async (resolve, reject) =>{
+        return new Promise( async (resolve, reject) =>{
             const req = (i: any, v: any) => {
-                return new Promise((_resolve,_reject)=>{
+                return new Promise(async (_resolve,_reject)=>{
                     try {
-                        let req = http.get({
-                            timeout: 5000,
-                            agent: this.agent,
-                            headers: this.finalHeaders,
-                            host: `${listDomains[i].replace("https://","")}`,
-                            path: `/`
-                        },(res) => {
-                            let index = this.status.findIndex((ctx) => ctx.domain === v.replace("https://",""))
-                            if(typeof res.statusCode !== 'undefined'){
-                                if(res.statusCode >= 200 && res.statusCode <= 399){
-                                    this.status[index].state = "online"
-                                } else {
-                                    this.status[index].state = "offline"
-                                }
-                            }
-                            _resolve(1)
-                        })
-                        req.on('error',(err) =>{
-                            _reject(err)
-                        })
+                        let index = this.status.findIndex((ctx) => ctx.domain === v.replace("https://",""))
+                        let req = await Undici.request(v,{method: "GET",dispatcher: this.agent})
+                        
+                        if(req.statusCode >= 200 && req.statusCode <= 399){
+                            if(typeof req.headers[maintenanceHeader] !== 'undefined' && req.headers[maintenanceHeader] === "yes") {this.status[index].state === 'maintenance'}
+                            else { this.status[index].state = "offline" }
+                        } else {
+                            this.status[index].state = "offline"
+                        }
+                        _resolve(1)
                     } catch(err){
                         _reject(err)
                     }
@@ -89,8 +84,7 @@ class UptimeCheck<IUP> {
                 await req(i,v).catch((err: Error) =>{
                     errT = true
                     errI = err
-                })
-                
+                })            
             } 
             if(errT){
                 return reject(errI)
@@ -100,4 +94,4 @@ class UptimeCheck<IUP> {
     }
 }
 
-export  { UptimeCheck }
+export  { UptimeCheck , STATUS , States}

@@ -5,11 +5,12 @@
  * License: GNU
  */
 type HEADERS = Array<Record<string, string>>;
-type STATUS = "online" | "offline" | "not-checked";
+type STATUS = "online" | "offline" | "not-checked" | "maintenance";
 type domainStates = {
     domain: string;
     state: STATUS;
 };
+type States = Array<domainStates>;
 declare class UptimeCheck<IUP> {
     status: Array<domainStates>;
     private finalHeaders;
@@ -18,4 +19,4 @@ declare class UptimeCheck<IUP> {
     humanify(headers: HEADERS): void;
     checkIfUp(): Promise<any>;
 }
-export { UptimeCheck };
+export { UptimeCheck, STATUS, States };

@@ -1,9 +1,4 @@
-# Uptime Pix4
-A uptime robot for Pix4 services
-
-# Example
-```js
-const { UptimeCheck } = require('uptime-pix4')
+const { UptimeCheck } = require('./lib/uptime');
 
 ( async () => {
     const robot = new UptimeCheck() // init class
@@ -17,4 +12,3 @@ const { UptimeCheck } = require('uptime-pix4')
 
     console.log(robot.status) // see status information
 })()
-```
